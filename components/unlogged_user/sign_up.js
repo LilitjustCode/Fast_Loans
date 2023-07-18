@@ -202,7 +202,7 @@ export default class App extends Component {
         privacy_policy_error: false,
       });
       try {
-        this.setState({ phone_disable_button: false});
+        this.setState({phone_disable_button: false});
         fetch('https://fastloans.justcode.am/api/send_call', {
           method: 'POST',
           headers: {
@@ -228,7 +228,6 @@ export default class App extends Component {
               this.setState({
                 phone_code_popup: true,
                 timer: 60,
-
               });
             } else {
               if (response.hasOwnProperty('message')) {
@@ -245,7 +244,7 @@ export default class App extends Component {
               }
               this.setState({
                 phone_error_popup: true,
-                phone_disable_button: true
+                phone_disable_button: true,
               });
               setTimeout(() => {
                 this.setState({
@@ -427,7 +426,7 @@ export default class App extends Component {
               alignItems: 'center',
               paddingTop: 20,
             }}>
-            {this.state.phone_disable_button  ? (
+            {this.state.phone_disable_button ? (
               <TouchableOpacity
                 style={[
                   styles.sign_up_send_code_btn,
@@ -930,7 +929,7 @@ export default class App extends Component {
                       Введите последние 4 цифры номера с которого вам позвонят
                     </Text>
                   </View>
-                  <Text style={{color: 'red'}}>{this.state.codes}</Text>
+                  {/* <Text style={{color: 'red'}}>{this.state.codes}</Text> */}
                   <View style={styles.phone_code_popup_codes_input_wrapper}>
                     {code.map((value, index) => (
                       <TextInput
