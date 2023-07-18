@@ -67,10 +67,11 @@ export default class App extends Component {
       timer: 60,
       keyboardOpen: false,
       phone_code_popup: false,
-
+      codes: '',
       phone_error_popup: false,
       phone_error_popup2: false,
       phone_code_error_popup: false,
+      showFooter: true,
     };
     this.inputRefs = [];
   }
@@ -135,9 +136,10 @@ export default class App extends Component {
         console.log(result, 'reesss');
       },
       error => {
-        console.error(error);
+        console.error(error, 'eeeee');
       },
     );
+
     this.timerInterval = setInterval(() => {
       this.setState(prevState => ({
         timer: prevState.timer > 0 ? prevState.timer - 1 : 0,
@@ -158,12 +160,6 @@ export default class App extends Component {
     this.keyboardDidHideListener.remove();
     clearInterval(this.timerInterval);
   }
-  //
-  //   handleResend = () => {
-  //        this.setState({
-  //            timer: 60,
-  //        })
-  // }
 
   redirectToCatalog = () => {
     this.props.navigation.navigate('Catalog');
@@ -206,6 +202,7 @@ export default class App extends Component {
         privacy_policy_error: false,
       });
       try {
+        this.setState({ phone_disable_button: false});
         fetch('https://fastloans.justcode.am/api/send_call', {
           method: 'POST',
           headers: {
@@ -220,8 +217,8 @@ export default class App extends Component {
             return response.json();
           })
           .then(async response => {
-            console.log(response, 'phoneCode');
-
+            // console.log(response, 'phoneCode');
+            this.setState({codes: response.code, phone_disable_button: false});
             if (response.hasOwnProperty('code')) {
               this.handlePress();
               await AsyncStorage.setItem(
@@ -231,6 +228,7 @@ export default class App extends Component {
               this.setState({
                 phone_code_popup: true,
                 timer: 60,
+
               });
             } else {
               if (response.hasOwnProperty('message')) {
@@ -247,6 +245,7 @@ export default class App extends Component {
               }
               this.setState({
                 phone_error_popup: true,
+                phone_disable_button: true
               });
               setTimeout(() => {
                 this.setState({
@@ -260,6 +259,7 @@ export default class App extends Component {
       }
     }
   };
+
   handleResend = async () => {
     let {phone} = this.state;
     let cleaned_phone_number = '+' + phone.replace(/\D/g, '');
@@ -319,6 +319,7 @@ export default class App extends Component {
         token: 'Welcome Home',
       };
       this.context.signIn(foundUser);
+      // this.props.navigation.navigate('CalculatorScreen');
     }
   };
 
@@ -327,13 +328,13 @@ export default class App extends Component {
       'log_in',
       {param: 'value'},
       result => console.log(result, 'ev rressss'),
-      error => console.error(error),
+      error => console.error(error, 'udh'),
     );
   };
 
   render() {
     const {code, isButtonDisabled, timer} = this.state;
-
+    // console.log(this.state.codes);
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar style="dark" />
@@ -359,8 +360,9 @@ export default class App extends Component {
                 }}
                 value={this.state.phone}
                 keyboardType={'phone-pad'}
-                // keyboardType="numeric"
                 placeholder="+7 (925) 888-88-88"
+                onFocus={() => this.setState({showFooter: false})}
+                onBlur={() => this.setState({showFooter: true})}
                 placeholderTextColor="#757575"
               />
             </View>
@@ -415,20 +417,23 @@ export default class App extends Component {
               </TouchableOpacity>
             </View>
           </View>
-
+        </ScrollView>
+        {this.state.showFooter && (
           <View
-            style={{width: '100%', paddingHorizontal: 16, marginBottom: 50}}>
-            {this.state.phone_disable_button ? (
+            style={{
+              width: '100%',
+              paddingHorizontal: 16,
+              height: 100,
+              alignItems: 'center',
+              paddingTop: 20,
+            }}>
+            {this.state.phone_disable_button  ? (
               <TouchableOpacity
                 style={[
                   styles.sign_up_send_code_btn,
                   {backgroundColor: '#2049D9'},
                 ]}
                 onPress={() => {
-                  // this.setState({
-                  //     phone_code_popup: true
-                  // })
-                  // this.handlePress();
                   this.sendPhone();
                 }}>
                 <Text style={styles.sign_up_send_code_btn_text}>
@@ -448,7 +453,7 @@ export default class App extends Component {
               </TouchableOpacity>
             )}
           </View>
-        </ScrollView>
+        )}
 
         {this.state.privacy_policy_popup && (
           <View style={styles.privacy_policy_popup}>
@@ -925,6 +930,7 @@ export default class App extends Component {
                       Введите последние 4 цифры номера с которого вам позвонят
                     </Text>
                   </View>
+                  <Text style={{color: 'red'}}>{this.state.codes}</Text>
                   <View style={styles.phone_code_popup_codes_input_wrapper}>
                     {code.map((value, index) => (
                       <TextInput
@@ -951,7 +957,6 @@ export default class App extends Component {
                         </Text>
                       </TouchableOpacity>
                     )}
-                    {/*<Text style={styles.timer_text}>{timer > 0 ? `Повторить через ${timer} сек.` : null}</Text>*/}
                     {timer == 0 && (
                       <TouchableOpacity
                         onPress={() => {
@@ -1019,7 +1024,7 @@ export default class App extends Component {
         {this.state.phone_code_error_popup && (
           <View style={styles.phone_error_popup}>
             <View style={styles.phone_error_popup_wrapper}>
-              <Text style={styles.phone_error_popup_title}>Не верный код</Text>
+              <Text style={styles.phone_error_popup_title}>Неверный код</Text>
             </View>
           </View>
         )}
@@ -1111,7 +1116,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     height: 51,
     paddingHorizontal: 28,
-    paddingVertical: 17,
+    // paddingVertical: 10,
+    alignItems: 'center',
     color: '#757575',
     fontWeight: '600',
     fontSize: 14,
@@ -1298,12 +1304,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     textAlign: 'center',
+    flexDirection: 'row',
     color: '#1B1B1B',
     fontWeight: '600',
     fontSize: 24,
   },
   phone_code_popup_codes_input_wrapper: {
-    width: 298,
+    width: '80%',
     flexDirection: 'row',
     alignSelf: 'center',
     alignItems: 'center',

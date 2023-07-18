@@ -23,17 +23,23 @@ const data = [
   {id: 6, text: '6 мес'},
 ];
 
-export default function App() {
+export default function App({navigation, show}) {
   [active, setActive] = useState(false);
   [txts, setTxt] = useState('');
 
-  const store = async text => {
-    try {
-      await AsyncStorage.setItem('month', text);
-    } catch (error) {
-      // Error saving data
-    }
-  };
+  // const store = async text => {
+  //   try {
+  //     await AsyncStorage.setItem('month', text);
+  //   } catch (error) {
+  //     // Error saving data
+  //   }
+  // };
+
+  useEffect(() => {
+    navigation.addListener('blur', () => {
+      setTxt('');
+    });
+  }, []);
 
   return (
     <View style={styles.calculatorHeader}>
@@ -46,7 +52,7 @@ export default function App() {
                 <TouchableOpacity
                   onPress={() => {
                     setTxt(value.text);
-                    store(value.text);
+                    // store(value.text);
                   }}
                   style={
                     txts === value.text ? styles.active : styles.priceBlock
@@ -64,6 +70,11 @@ export default function App() {
           </View>
         </ScrollView>
       </View>
+      {txts == '' && show == 'yes' ? (
+        <Text style={styles.errorText}>Обязательно к заполнению</Text>
+      ) : (
+        ''
+      )}
     </View>
   );
 }
@@ -81,11 +92,19 @@ const styles = StyleSheet.create({
   },
   calculatorBlock: {
     width: '100%',
-    backgroundColor: '#2730461F',
+    backgroundColor: '#F3F3F3',
     borderRadius: 20,
     height: 92,
     marginTop: 20,
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
 
   slider: {
@@ -112,11 +131,26 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#F3F3F3',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   activeText: {
     textAlign: 'center',
     color: '#466AE5',
     fontSize: 30,
     fontWeight: '600',
+  },
+  errorText: {
+    marginTop: 5,
+    marginLeft: 5,
+    color: 'red',
   },
 });

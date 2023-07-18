@@ -19,9 +19,7 @@ export default function App({navigation}) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.containerHeader}>
-        <TouchableOpacity
-        onPress={() => navigation.navigate('ProfileScreen')}
-        >
+        <TouchableOpacity onPress={() => navigation.navigate('ProfileScreen')}>
           <Image
             style={{width: 34, height: 34}}
             source={require('../../assets/img/avatar_icon.png')}
@@ -41,7 +39,7 @@ export default function App({navigation}) {
             оператор!
           </Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate('DoneScreen')}
+            onPress={() => navigation.navigate('HistoryScreen')}
             style={[styles.bigButton, {marginTop: 120}]}>
             <Text style={styles.bigbtntxt}>Продолжить</Text>
           </TouchableOpacity>

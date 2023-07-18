@@ -11,19 +11,91 @@ import {
   ScrollView,
 } from 'react-native';
 import FooterBlock from '../footer/Footer';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PhoneSvg from '../../assets/svg/phone';
 import MailIcon from '../../assets/svg/Email';
 import Bell from '../../assets/svg/Bell';
 import Remove from '../../assets/svg/Remove';
+import {AuthContext} from '../AuthContext/context';
 import Sign from '../../assets/svg/SignOut';
-// import CustomSwitch from 'react-native-custom-switch';
+
 import {Switch} from 'react-native-switch';
 
 export default function App({navigation}) {
   const [price, setPrice] = useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
+  const authContext = useContext(AuthContext);
+
+  const [mail, setMail] = useState('');
+
   const [val, setVal] = useState(true);
+  const [token, setToken] = useState(null);
+  const [phone, setPhone] = useState('');
+  const [phoneDisableButton, setPhoneDisableButton] = useState(false);
+  const [show, setShow] = useState(true);
+
+  const phoneValidation = val => {
+    let x = val
+      .replace(/\D/g, '')
+      .match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
+    let myPhone = !x[2]
+      ? '+7 ' + (x[1] !== '7' ? x[1] : '')
+      : !x[3]
+      ? '+7 (' + x[2]
+      : '+7 (' +
+        x[2] +
+        ') ' +
+        (x[3] ? x[3] : '') +
+        (x[4] ? ' - ' + x[4] : '') +
+        (x[5] ? ' - ' + x[5] : '');
+
+    const isValid = validatePhoneNumber(myPhone);
+    setPhoneDisableButton(isValid);
+    setPhone(myPhone);
+  };
+
+  const validatePhoneNumber = phoneNumber => {
+    let regex = /^([789]\d{10})$/;
+    let newPhone = phoneNumber.replace(/\D/g, '');
+    return regex.test(newPhone);
+  };
+
+  const logout = async () => {
+    try {
+      // await AsyncStorage.removeItem('userToken');
+      authContext.signOut();
+    } catch (exception) {
+      return false;
+    }
+  };
+
+  const store = async () => {
+    try {
+      await AsyncStorage.setItem('numberPhone', phone);
+      await AsyncStorage.setItem('mail', mail);
+    } catch (error) {
+      // Error saving data
+    }
+  };
+
+  useEffect(() => {
+    const getToken = async () => {
+      try {
+        const value = await AsyncStorage.getItem('userToken');
+        const phh = await AsyncStorage.getItem('numberPhone');
+        const mailss = await AsyncStorage.getItem('mail');
+        setPhone(phh);
+        setMail(mailss);
+        setToken(value);
+      } catch (exception) {
+        return false;
+      }
+    };
+    getToken();
+  }, []);
+
+  console.log(phone, 'jdk');
 
   return (
     <SafeAreaView style={styles.container}>
@@ -45,10 +117,17 @@ export default function App({navigation}) {
           <Text style={styles.txt}>Номер телефона</Text>
         </View>
         <TextInput
+          value={phone}
+          onChangeText={text => {
+            phoneValidation(text);
+            store();
+          }}
           placeholder="+7 999 999 99 99"
           placeholderTextColor={'#1B1B1B80'}
-          keyboardType="numeric"
+          keyboardType="phone-pad"
           style={[styles.input]}
+          onFocus={() => setShow(false)}
+          onBlur={() => setShow(true)}
         />
         <View style={styles.block}>
           <MailIcon />
@@ -58,58 +137,66 @@ export default function App({navigation}) {
           placeholder="Добавить..."
           placeholderTextColor={'#1B1B1B80'}
           style={[styles.input]}
+          value={mail}
+          onChangeText={text => {
+            setMail(text);
+            store();
+          }}
+          onFocus={() => setShow(false)}
+          onBlur={() => setShow(true)}
         />
         <View style={styles.push}>
           <View style={styles.block}>
             <Bell />
             <Text style={styles.txt}>Push уведомления</Text>
           </View>
-          {/* <CustomSwitch
-            onSwitch={() => {}}
-            buttonWidth={30}
-            switchWidth={60}
-            buttonPadding={2}
-            buttonColor={'white'}
-            switchBorderColor={'#F3DFA2'}
-            buttonBorderColor={'white'}
-            switchBackgroundColor={'rgba(70, 106, 229, 0.30)'}
-           onSwitchBackgroundColor={'#BB4430'}
-          /> */}
-          <Switch
-            value={val}
-            onValueChange={() => setVal(!val)}
-            disabled={false}
-            activeText={'On'}
-            inActiveText={'Off'}
-            circleSize={30}
-            barHeight={30}
-            circleBorderWidth={0}
-            backgroundActive={'#466AE5'}
-            backgroundInactive={'rgba(70, 106, 229, 0.30)'}
-            circleActiveColor={'white'}
-            circleInActiveColor={'white'}
-            changeValueImmediately={true} // if rendering inside circle, change state immediately or wait for animation to complete
-            innerCircleStyle={{alignItems: 'center', justifyContent: 'center'}} // style for inner animated circle for what you (may) be rendering inside the circle
-            outerCircleStyle={{}} // style for outer animated circle
-            renderActiveText={false}
-            renderInActiveText={false}
-            switchLeftPx={2} // denominator for logic when sliding to TRUE position. Higher number = more space from RIGHT of the circle to END of the slider
-            switchRightPx={2} // denominator for logic when sliding to FALSE position. Higher number = more space from LEFT of the circle to BEGINNING of the slider
-            switchWidthMultiplier={2} // multiplied by the `circleSize` prop to calculate total width of the Switch
-            switchBorderRadius={30} // Sets the border Radius of the switch slider. If unset, it remains the circleSize.
-          />
+          <View style={{paddingTop: 20}}>
+            <Switch
+              value={val}
+              onValueChange={() => setVal(!val)}
+              disabled={false}
+              activeText={'On'}
+              inActiveText={'Off'}
+              circleSize={30}
+              barHeight={30}
+              circleBorderWidth={0}
+              backgroundActive={'#466AE5'}
+              backgroundInactive={'rgba(70, 106, 229, 0.30)'}
+              circleActiveColor={'white'}
+              circleInActiveColor={'white'}
+              changeValueImmediately={true}
+              innerCircleStyle={{
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              outerCircleStyle={{}}
+              renderActiveText={false}
+              renderInActiveText={false}
+              switchLeftPx={2}
+              switchRightPx={2}
+              switchWidthMultiplier={2}
+              switchBorderRadius={30}
+            />
+          </View>
         </View>
-        <View style={styles.block}>
+        <TouchableOpacity
+          onPress={() => {
+            logout();
+          }}
+          style={styles.block}>
           <Remove />
           <Text style={styles.txt}>Удалить аккаунт</Text>
-        </View>
-        <View style={styles.block}>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            logout();
+          }}
+          style={styles.block}>
           <Sign />
           <Text style={styles.txt}>Выйти</Text>
-        </View>
+        </TouchableOpacity>
       </ScrollView>
-
-      <FooterBlock navigation={navigation} />
+      {show && <FooterBlock navigation={navigation} />}
     </SafeAreaView>
   );
 }
@@ -195,6 +282,5 @@ const styles = StyleSheet.create({
   push: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
   },
 });

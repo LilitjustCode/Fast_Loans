@@ -217,6 +217,15 @@ export default function App() {
                 tabBarStyle: {display: 'none'},
               })}
             />
+
+            {/* <Stack.Screen
+              name="SignUp"
+              component={SignUpScreen}
+              options={({route}) => ({
+                tabBarButton: () => null,
+                tabBarStyle: {display: 'none'},
+              })}
+            /> */}
           </Stack.Navigator>
         )}
       </NavigationContainer>

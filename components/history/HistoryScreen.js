@@ -9,6 +9,7 @@ import {
   Image,
   TextInput,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import FooterBlock from '../footer/Footer';
 import React, {useEffect, useState} from 'react';
@@ -16,9 +17,12 @@ import CommentIcon from '../../assets/svg/comment';
 import ArrowIcon from '../../assets/svg/arrow_svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const windowWidth = Dimensions.get('window').width;
+
 export default function App({navigation}) {
   const [price, setPrice] = useState('');
   const [date, setDate] = useState(new Date());
+  const [showFooter, setShowFooter] = useState(true);
 
   useEffect(() => {
     const getMess = async () => {
@@ -69,17 +73,8 @@ export default function App({navigation}) {
           </Text>
         )}
       </ScrollView>
-      <View style={styles.messageBlock}>
-        <TextInput
-          placeholder="Сообщение..."
-          placeholderTextColor={'white'}
-          style={styles.input}
-        />
-        <TouchableOpacity onPress={() => navigation.navigate('ChatScreen')}>
-          <ArrowIcon />
-        </TouchableOpacity>
-      </View>
-      <FooterBlock navigation={navigation} />
+
+      {showFooter && <FooterBlock navigation={navigation} />}
     </SafeAreaView>
   );
 }
@@ -109,7 +104,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     color: 'white',
   },
-
   textdesc: {
     color: '#1B1B1B',
     textAlign: 'center',
@@ -139,7 +133,7 @@ const styles = StyleSheet.create({
   },
   headerName: {
     color: 'white',
-    fontSize: 18,
+    fontSize: windowWidth < 392 ? 16 : 18,
     fontWeight: '500',
   },
   arrayblock: {
@@ -154,7 +148,7 @@ const styles = StyleSheet.create({
   },
   mainText: {
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: windowWidth < 392 ? 14 : 16,
     fontWeight: '500',
     color: '#1B1B1B',
   },

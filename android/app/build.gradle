@@ -73,9 +73,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.justcode.fastLoans"
+    namespace "com.justcode.fastloans"
     defaultConfig {
-        applicationId "com.justcode.fastLoans"
+        applicationId "com.justcode.fastloans"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -1,4 +1,4 @@
-package com.justcode.fastLoans;
+package com.justcode.fastloans;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

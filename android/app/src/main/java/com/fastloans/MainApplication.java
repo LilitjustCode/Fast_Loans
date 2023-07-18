@@ -1,4 +1,4 @@
-package com.justcode.fastLoans;
+package com.justcode.fastloans;
 
 import android.app.Application;
 import com.facebook.react.PackageList;
@@ -14,6 +14,7 @@ import android.content.Intent;
 import com.appsflyer.AppsFlyerConversionListener;
 import com.appsflyer.reactnative.RNAppsFlyerPackage;
 import com.appsflyer.reactnative.RNAppsFlyerModule;
+import com.facebook.react.ReactInstanceManager;
 
 // import com.appsflyer.AppsFlyerLib;
 
@@ -67,7 +68,7 @@ public class MainApplication extends Application implements ReactApplication {
       // If you opted-in for the New Architecture, we load the native entry point for this app.
       DefaultNewArchitectureEntryPoint.load();
     }
-    ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    // ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
      
   }
 }

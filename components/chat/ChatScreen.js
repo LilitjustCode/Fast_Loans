@@ -22,6 +22,7 @@ export default function App({navigation}) {
   const [show, setShow] = useState(false);
   const [messStorage, setMessStorage] = useState('');
   const [showView, setShowView] = useState(false);
+ 
 
   const store = async () => {
     try {
@@ -197,11 +198,10 @@ const styles = StyleSheet.create({
   messageBlockComm: {
     width: 262,
     marginLeft: 5,
-    height: 100,
     backgroundColor: 'rgba(70, 106, 229, 0.40)',
     borderRadius: 10,
     paddingHorizontal: 15,
-    paddingVertical: 15,
+    paddingVertical: 20,
   },
   messTextComm: {
     fontSize: 16,

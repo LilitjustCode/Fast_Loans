@@ -9,12 +9,16 @@ import {
   Image,
   TextInput,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 
 import {useState} from 'react';
 import CommentIcon from '../../assets/svg/comment';
 
+const windowWidth = Dimensions.get('window').width;
+
 export default function App({navigation}) {
+  console.log(windowWidth, 'mn');
   return (
     <View style={styles.footerFirst}>
       <View style={styles.footer}>
@@ -48,7 +52,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   miniButton: {
-    width: '30%',
+    // width: windowWidth < 392 ? '35%' : '30%',
+    paddingHorizontal: 16,
     borderRadius: 15,
     backgroundColor: '#466AE5',
     height: 45,
