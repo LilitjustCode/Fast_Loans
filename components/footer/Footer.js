@@ -18,7 +18,7 @@ import CommentIcon from '../../assets/svg/comment';
 const windowWidth = Dimensions.get('window').width;
 
 export default function App({navigation}) {
-  console.log(windowWidth, 'mn');
+
   return (
     <View style={styles.footerFirst}>
       <View style={styles.footer}>

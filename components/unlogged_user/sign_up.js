@@ -929,7 +929,7 @@ export default class App extends Component {
                       Введите последние 4 цифры номера с которого вам позвонят
                     </Text>
                   </View>
-                  {/* <Text style={{color: 'red'}}>{this.state.codes}</Text> */}
+                  {/* <Text style={{color: 'red'}}>{this.state.codes}</Text>  */}
                   <View style={styles.phone_code_popup_codes_input_wrapper}>
                     {code.map((value, index) => (
                       <TextInput

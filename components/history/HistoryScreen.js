@@ -21,19 +21,17 @@ const windowWidth = Dimensions.get('window').width;
 
 export default function App({navigation}) {
   const [price, setPrice] = useState('');
-  const [date, setDate] = useState(new Date());
   const [showFooter, setShowFooter] = useState(true);
+  const [historyArray, setHistoryArray] = useState([]);
 
   useEffect(() => {
     const getMess = async () => {
       try {
-        const value = await AsyncStorage.getItem('price');
-        if (value !== null) {
-          setPrice(value);
+        const vaalll = await AsyncStorage.getItem('history');
+        if (vaalll !== null) {
+          setHistoryArray(vaalll);
         }
-      } catch (error) {
-        // Error retrieving data
-      }
+      } catch (error) {}
     };
     getMess();
   });
@@ -54,18 +52,22 @@ export default function App({navigation}) {
       </View>
 
       <ScrollView style={{paddingHorizontal: 16}}>
-        {price ? (
+        {historyArray.length > 0 ? (
           <View>
             <View style={styles.headerBlock}>
               <Text style={styles.headerName}>Дата</Text>
               <Text style={styles.headerName}>Сумма</Text>
               <Text style={styles.headerName}>Статус</Text>
             </View>
-            <View style={styles.arrayblock}>
-              <Text style={styles.mainText}>08.01.2023</Text>
-              <Text style={styles.mainText}>{price} руб</Text>
-              <Text style={styles.mainText}>Рассмотрение</Text>
-            </View>
+            {JSON.parse(historyArray)?.map((value, index) => {
+              return (
+                <View key={index} style={styles.arrayblock}>
+                  <Text style={styles.mainText}>{value.date}</Text>
+                  <Text style={styles.mainText}>{value.prices} руб</Text>
+                  <Text style={styles.mainText}>Рассмотрение</Text>
+                </View>
+              );
+            })}
           </View>
         ) : (
           <Text style={styles.textdesc}>
@@ -130,6 +132,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     paddingHorizontal: 38,
     paddingVertical: 10,
+    // marginBottom: 20,
   },
   headerName: {
     color: 'white',
@@ -138,13 +141,12 @@ const styles = StyleSheet.create({
   },
   arrayblock: {
     width: '100%',
-
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 20,
+    marginTop: 10,
     paddingHorizontal: 6,
-    paddingVertical: 10,
+    // paddingVertical: 10,
   },
   mainText: {
     textAlign: 'center',

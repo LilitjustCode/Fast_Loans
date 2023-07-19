@@ -30,6 +30,8 @@ export default function App({navigation, show}) {
     });
   }, []);
 
+
+  
   return (
     <View style={styles.calculatorHeader}>
       <View style={styles.calculatorBlock}>

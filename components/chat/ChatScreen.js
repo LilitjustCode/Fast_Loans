@@ -11,10 +11,17 @@ import {
   ScrollView,
 } from 'react-native';
 import FooterBlock from '../footer/Footer';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import CommentIcon from '../../assets/svg/comment';
 import ArrowIcon from '../../assets/svg/arrow_svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const data = [
+  {
+    message: 'Вы можете задать нам вопрос и мы ответим в ближайшее время!',
+    owner_id: 1,
+  },
+];
 
 export default function App({navigation}) {
   const [mess, setMess] = useState('');
@@ -22,8 +29,8 @@ export default function App({navigation}) {
   const [show, setShow] = useState(false);
   const [messStorage, setMessStorage] = useState('');
   const [showView, setShowView] = useState(false);
- 
-
+  const [array, setArray] = useState(data);
+  const scrollViewRef = useRef();
   const store = async () => {
     try {
       if (mess !== '') {
@@ -50,12 +57,19 @@ export default function App({navigation}) {
         if (value !== null) {
           setMessStorage(value);
         }
-      } catch (error) {
-        // Error retrieving data
-      }
+      } catch (error) {}
     };
     getMess();
   });
+
+  const sendMess = mess => {
+    if (mess.length > 0) {
+      let arr = array;
+      arr.push({owner_id: 2, message: mess});
+      setArray(arr);
+      scrollViewRef.current.scrollToEnd({animated: true});
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -71,45 +85,34 @@ export default function App({navigation}) {
         </View>
         <Text style={styles.headerText}>Поддержка</Text>
       </View>
-
-      <ScrollView style={{paddingHorizontal: 16}}>
-        <View style={{marginTop: 20}}>
-          <View style={styles.firstMess}>
-            <View style={styles.mainMess}>
-              <Image
-                style={styles.imageuser}
-                source={require('../../assets/Frame257.png')}
-              />
-              <View style={styles.messageBlockComm}>
-                <Text style={styles.messTextComm}>
-                  Вы можете задать нам вопрос и мы ответим в ближайшее время!
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View style={styles.secondMess}>
-            {messStorage && show && (
-              <View style={styles.messageBlockMe}>
-                <Text style={styles.messTextMe}>{messStorage}</Text>
-              </View>
-            )}
-          </View>
-          {showView && (
-            <View style={styles.firstMess}>
-              <View style={styles.mainMess}>
-                <Image
-                  style={styles.imageuser}
-                  source={require('../../assets/Frame257.png')}
-                />
-                <View style={styles.messageBlockComm}>
-                  <Text style={styles.messTextComm}>
-                    В настоящий момент все операторы заняты, пожалуйста
-                    подождите.
-                  </Text>
+      <ScrollView
+        ref={scrollViewRef}
+        onContentSizeChange={() =>
+          scrollViewRef.current.scrollToEnd({animated: true})
+        }
+        style={{paddingHorizontal: 16}}>
+        <View style={{marginTop: 20, paddingBottom: 50}}>
+          {array.map((value, index) => {
+            return value.owner_id == 1 ? (
+              <View key={index} style={styles.firstMess}>
+                <View style={styles.mainMess}>
+                  <Image
+                    style={styles.imageuser}
+                    source={require('../../assets/Frame257.png')}
+                  />
+                  <View style={styles.messageBlockComm}>
+                    <Text style={styles.messTextComm}>{value.message}</Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          )}
+            ) : (
+              <View key={index} style={styles.secondMess}>
+                <View style={styles.messageBlockMe}>
+                  <Text style={styles.messTextMe}>{value.message}</Text>
+                </View>
+              </View>
+            );
+          })}
         </View>
       </ScrollView>
       <View style={styles.messageBlock}>
@@ -124,9 +127,23 @@ export default function App({navigation}) {
         />
         <TouchableOpacity
           onPress={() => {
+            sendMess(mess);
             setMess('');
-            store();
-            setShow(true);
+            if (array.length == 2) {
+              setShow(true);
+
+              setTimeout(() => {
+                let arr = array;
+                arr.push({
+                  owner_id: 1,
+                  message:
+                    'В настоящий момент все операторы заняты, пожалуйста подождите.',
+                });
+                setArray(arr);
+                setShow(false);
+              }, 4000);
+            }
+
             appendVew();
           }}>
           <ArrowIcon />
@@ -182,6 +199,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     marginTop: 20,
+    marginBottom: 15,
   },
   secondMess: {
     flex: 1,
@@ -216,7 +234,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 15,
-    marginTop: 30,
+    marginTop: 5,
   },
   messTextMe: {
     fontSize: 16,

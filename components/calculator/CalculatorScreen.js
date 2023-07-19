@@ -30,6 +30,8 @@ export default function App({navigation}) {
   const [text, setText] = useState('');
   const [openPicker, setOpenPicker] = useState(false);
   const [dateIsSelected, setDateIsSelected] = useState(false);
+  const [array, setArray] = useState([]);
+  const [targetDate, setTargetDate] = useState(new Date());
 
   useEffect(() => {
     navigation.addListener('blur', () => {
@@ -53,6 +55,24 @@ export default function App({navigation}) {
     setDate(value);
     setDateIsSelected(true);
   };
+
+  const pusharray = async () => {
+    const month =
+      targetDate.getMonth() < 9
+        ? `0${targetDate.getMonth() + 1}`
+        : `${targetDate.getMonth() + 1}`;
+        
+    let arr = array;
+    arr.push({
+      prices: price,
+      date: `${targetDate.getDate()}.${month}.${targetDate.getFullYear()}`,
+    });
+    setArray(arr);
+    try {
+      await AsyncStorage.setItem('history', JSON.stringify(array));
+    } catch (error) {}
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={{paddingHorizontal: 16}}>
@@ -129,6 +149,7 @@ export default function App({navigation}) {
             if (name.length == 0 && text.length == 0) {
               setShow(true);
             } else {
+              pusharray();
               navigation.navigate('DoneScreen');
               setShow(false);
             }
